@@ -1,0 +1,237 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Admin {
+  id                            Int      @id @default(autoincrement())
+  fullName                      String
+  chatId                        String?
+  email                         String   @unique
+  password                      String?
+  role                          String
+  username                      String?
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @default(now())
+  calendarEvent CalendarEvent[]
+}
+
+model ForwarderAdmin {
+  id                            Int      @id @default(autoincrement())
+  chatId                        String?
+  fullName                      String
+  email                         String   @unique
+  password                      String?
+  accessToken                   String
+  refreshToken                  String
+  role                          String
+  companyName                   String   @unique
+  physicalAddress               String?
+  phoneNumber                   String?
+  username                      String?
+  avatar                        String?
+  businessRegistrationNumber    String? 
+  vatNumber                     String? 
+  kargoAccountNumber            Int @default(autoincrement()) @unique(map: "kargo_account_number_unique")
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @default(now())
+  calanderEvent                 CalendarEvent[]
+  bco                           Bco[]
+}
+
+model Bco {
+  id            Int            @id @default(autoincrement())
+  chatId        String?
+  fullName      String
+  emailAddress  String
+  password      String?
+  invitedStatus String
+  forwarderId   Int?
+  phoneNumber                   String? 
+  physicalAddress               String?
+  username      String?
+  contactId     Int?
+  companyId     Int?
+  comment_count Int            @default(0)
+  created_at    DateTime       @default(now())
+  brnCard       String?
+  vatNumber     String?
+  kargoAccountNumber String    @default(dbgenerated("'B' || LPAD(nextval('\"BCO_kargoAccountNumber_seq\"')::TEXT, 8, '0')::INT"))
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
+  company       Company?       @relation("CompanyBco", fields: [companyId], references: [id])
+  contact       Contact?       @relation("ContactToBco", fields: [contactId], references: [id])
+  forwarder     ForwarderAdmin? @relation(fields: [forwarderId], references: [id], onDelete: Cascade)
+  supplier      Supplier[]
+  calendarEvent CalendarEvent[]
+}
+
+model Chb {
+  id                            Int      @id @default(autoincrement())
+  fullName                      String
+  chatId                        String?
+  email                         String   @unique
+  password                      String?
+  accessToken                   String
+  refreshToken                  String
+  role                          String
+  companyName                   String   @unique
+  physicalAddress               String?
+  phoneNumber                   String?
+  username                      String?
+  avatar                        String?
+  businessRegistrationNumber    String? 
+  customsRegistrationNumber     String?
+  vatNumber                     String? 
+  kargoAccountNumber            String   @default(dbgenerated("'C' || LPAD(nextval('\"CHB_kargoAccountNumber_seq\"')::TEXT, 8, '0')::INT"))
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @default(now())
+  calendarEvent CalendarEvent[]
+}
+
+model Supplier {
+  id            Int            @id @default(autoincrement())
+  chatId                        String?
+  fullName                      String
+  email  String
+  password                      String?
+  invitedStatus String
+  product       String
+  bcoId         Int
+  port          String
+  contactId     Int?
+  companyId     Int?
+  comment_count Int            @default(0)
+  created_at    DateTime       @default(now())
+  brnCard       String?
+  vatNumber     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @default(now())
+  company       Company?       @relation("CompanySupplier", fields: [companyId], references: [id])
+  contact       Contact?       @relation("ContactToSupplier", fields: [contactId], references: [id])
+  bco           Bco            @relation(fields: [bcoId], references: [id], onDelete: Cascade)
+  calendarEvent CalendarEvent[]
+}
+
+model Company {
+  id                         Int                 @id @default(autoincrement())
+  companyName                String
+  registeredAddress          String?
+  businessRegistrationNumber String?             @default("")
+  vatNumber                  String?             @default("")
+  unlocodeRegisteredAddress  String?             @default("")
+  createdAt                  DateTime            @default(now())
+  updatedAt                  DateTime            @default(now())
+  apiIntegrationLogs         APIIntegrationLog[]
+  createdBCOs                Bco[]               @relation("CompanyBco")
+  createdSuppliers           Supplier[]          @relation("CompanySupplier")
+  companyTiers               CompanyTier[]
+  contacts                   Contact[]
+  eventTrackings             EventTracking[]
+  shippingRoutes             ShippingRoute[]
+  warehouseAddresses         WarehouseAddress[]
+}
+
+model WarehouseAddress {
+  id                       Int      @id @default(autoincrement())
+  addressLine1             String?
+  addressLine2             String?  @default("")
+  cityCountry              String?
+  unlocodeWarehouseAddress String?  @default("")
+  companyId                Int
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @default(now())
+  company                  Company? @relation(fields: [companyId], references: [id])
+}
+
+
+model Contact {
+  id               Int      @id @default(autoincrement())
+  companyId        Int
+  contactName      String
+  emailAddress     String
+  phoneNumber      String
+  accountReference String?  @default("")
+  status           String?
+  apiCustomerCode  String?  @default("")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
+  bco              Bco[]    @relation("ContactToBco")
+  supplier         Supplier[] @relation("ContactToSupplier")
+  company          Company?  @relation(fields: [companyId], references: [id])
+}
+
+model ShippingRoute {
+  id          Int      @id @default(autoincrement())
+  companyId   Int
+  countryPort String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  company     Company  @relation(fields: [companyId], references: [id])
+}
+
+model Tier {
+  id               Int           @id @default(autoincrement())
+  tierName         String
+  markupPercentage Float
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now())
+  companyTiers     CompanyTier[]
+}
+
+model CompanyTier {
+  id        Int      @id @default(autoincrement())
+  companyId Int
+  tierId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  company   Company  @relation(fields: [companyId], references: [id])
+  tier      Tier     @relation(fields: [tierId], references: [id])
+}
+
+model APIIntegrationLog {
+  logID           Int      @id @default(autoincrement())
+  companyId       Int
+  apiType         String
+  requestDetails  String
+  responseDetails String
+  status          String
+  timestamp       DateTime
+  createdAt       DateTime @default(now())
+  company         Company  @relation(fields: [companyId], references: [id])
+}
+
+model EventTracking {
+  eventID           Int      @id @default(autoincrement())
+  companyId         Int
+  shipmentReference String
+  eventType         String
+  eventTimestamp    DateTime
+  location          String
+  createdAt         DateTime @default(now())
+  company           Company  @relation(fields: [companyId], references: [id])
+}
+
+model CalendarEvent {
+  id                  String    @id @unique
+  allDay              Boolean
+  end                 String
+  start               String
+  title               String
+  eventDetails        String?
+  forwarderAdmin      ForwarderAdmin? @relation(fields: [forwarderAdminId], references: [id])
+  forwarderAdminId    Int?
+  admin               Admin?   @relation(fields: [adminId], references: [id])
+  adminId             Int?
+  bco                 Bco?     @relation(fields: [bcoId], references: [id])
+  bcoId               Int?
+  chb                 Chb?     @relation(fields: [chbId], references: [id])
+  chbId               Int?
+  supplier            Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId          Int?
+}

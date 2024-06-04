@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>KARGO Importer Invitation Email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style type="text/css">
+      /* Base  */
+      body {
+        margin: 0;
+        padding: 0;
+        min-width: 100%;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        background-color: #fafafa;
+        color: #222222;
+      }
+      a {
+        color: #c9d0d6;
+        text-decoration: none;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-top: 0;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 24px;
+      }
+      table td {
+        vertical-align: top;
+      }
+      /* Layout  */
+      .email-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .email-header {
+        background-color: #1e293b;
+        padding: 24px;
+        color: #f1f5f9;
+      }
+      .email-body {
+        padding: 24px;
+        background-color: #f1f5f9;
+      }
+      .email-footer {
+        background-color: #4b5563;
+        padding: 24px;
+        color: #f1f5f9;
+      }
+      /* Buttons  */
+      .button {
+        display: inline-block;
+        background-color: #111827;
+        color: #f3f4f6;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 4px;
+      }
+
+      .button-link {
+        display: inline-block;
+        color: #1a4c8c; /* Adjust the color to your preference */
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <div class="email-header">
+        <h1>Welcome to KARGO</h1>
+      </div>
+      <div class="email-body">
+        <p>Hey <%= invitedName %> ,</p>
+        <p>
+          <%= inviterFullName %> from <%= inviterCompanyName %> has invited to
+          join KARGO.
+        </p>
+        <p>
+          <a
+            class="button-link"
+            href="<%= signupLink %>"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Sign Up Now</a
+          >
+        </p>
+      </div>
+      <div class="email-footer">
+        If you have any questions, please don't hesitate to contact us at
+        <a href="mailto:contact@kargo.co">contact@kargo.co</a>
+      </div>
+    </div>
+  </body>
+</html>
